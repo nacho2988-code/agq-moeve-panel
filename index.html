@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AGQ Labs · Panel MOEVE Bridge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS — AGQ Labs Corporate Identity (mismos que agq-radar-data)
+   ============================================================ */
+:root{
+  --paper:#F7F6F3; --paper-dim:#EEECEA; --card:#FFFFFF;
+  --ink:#1A1830; --ink-soft:#5A5870;
+  --line:#E0DED8; --line-strong:#C8C5BA;
+  --agq-purple:#565294; --agq-purple-deep:#3C3A6B; --agq-purple-mid:#6E6BAD; --agq-purple-bg:#ECEAF6;
+  --agq-green:#84BD00; --agq-green-deep:#5E8500; --agq-green-bg:#EEF6DB;
+  --amber:#C97B2E; --amber-bg:#FBEBD9;
+  --terracotta:#A23B3B; --terracotta-bg:#F6E2DF;
+  --slate:#6B7280; --slate-bg:#E9EAEC;
+  --shadow-s:0 1px 4px rgba(29,27,42,0.08); --shadow-m:0 4px 16px rgba(29,27,42,0.10);
+  --radius-s:5px; --radius-m:10px; --radius-l:14px;
+  --font-display:'Space Grotesk',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'IBM Plex Mono',monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F0E1A; --paper-dim:#1A1830; --card:#1E1D30;
+    --ink:#E8E6F0; --ink-soft:#9896B0;
+    --line:#2E2C44; --line-strong:#3E3C58;
+    --agq-purple-bg:rgba(86,82,148,0.15); --agq-green-bg:rgba(132,189,0,0.10);
+    --amber-bg:rgba(201,123,46,0.12); --terracotta-bg:rgba(162,59,59,0.12); --slate-bg:rgba(107,114,128,0.12);
+    --shadow-s:0 1px 4px rgba(0,0,0,0.3); --shadow-m:0 4px 16px rgba(0,0,0,0.4);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F0E1A; --paper-dim:#1A1830; --card:#1E1D30;
+  --ink:#E8E6F0; --ink-soft:#9896B0;
+  --line:#2E2C44; --line-strong:#3E3C58;
+  --agq-purple-bg:rgba(86,82,148,0.15); --agq-green-bg:rgba(132,189,0,0.10);
+  --amber-bg:rgba(201,123,46,0.12); --terracotta-bg:rgba(162,59,59,0.12); --slate-bg:rgba(107,114,128,0.12);
+  --shadow-s:0 1px 4px rgba(0,0,0,0.3); --shadow-m:0 4px 16px rgba(0,0,0,0.4);
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);}
+a{color:var(--agq-purple-deep);}
+
+header.topbar{
+  background:linear-gradient(135deg, #1A1830 0%, #2D2B4E 60%, #3C3A6B 100%);
+  color:#fff; display:flex; align-items:center; gap:14px;
+  padding:0 28px; height:64px; position:relative;
+  box-shadow:0 2px 12px rgba(29,27,42,0.25);
+}
+header.topbar::after{
+  content:''; position:absolute; bottom:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--agq-green) 0%, #a8d840 50%, var(--agq-green) 100%);
+}
+.brand-logo div{background:#fff;border-radius:8px;padding:5px 10px;display:flex;align-items:center;}
+.brand-logo img{height:28px;width:auto;display:block;}
+.brand-text{display:flex;flex-direction:column;line-height:1.15;}
+.brand-text .brand-name{font-family:var(--font-display);font-weight:700;font-size:16px;color:#fff;letter-spacing:0.01em;}
+.brand-text .brand-tagline{font-family:var(--font-mono);font-size:9.5px;font-weight:400;color:var(--agq-green);letter-spacing:0.10em;text-transform:uppercase;margin-top:1px;}
+
+main{max-width:960px;margin:0 auto;padding:28px 20px 64px;}
+h1{font-family:var(--font-display);font-size:1.15rem;font-weight:700;margin:0 0 4px;color:var(--ink);}
+.subtitle{color:var(--ink-soft);font-size:0.88rem;margin:0 0 24px;}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:28px;}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-m);padding:16px 18px;box-shadow:var(--shadow-s);}
+.tile .value{font-family:var(--font-display);font-size:2rem;font-weight:700;}
+.tile .label{color:var(--ink-soft);font-size:0.8rem;margin-top:2px;}
+.tile.good .value{color:var(--agq-green-deep);}
+.tile.warning .value{color:var(--amber);}
+.tile.critical .value{color:var(--terracotta);}
+
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-m);overflow:hidden;box-shadow:var(--shadow-s);}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);font-size:0.86rem;}
+th{color:var(--ink-soft);font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;background:var(--paper-dim);}
+tr:last-child td{border-bottom:none;}
+.mono{font-family:var(--font-mono);font-size:0.83rem;}
+.num{font-variant-numeric:tabular-nums;}
+.muted{color:var(--ink-soft);}
+.seal{display:inline-flex;align-items:center;gap:5px;font-size:0.78rem;font-weight:600;padding:3px 9px 3px 6px;border-radius:20px;}
+.seal span[aria-hidden]{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:currentColor;color:var(--card);font-size:0.62rem;}
+.empty{text-align:center;padding:48px 20px;color:var(--ink-soft);background:var(--card);border:1px dashed var(--line);border-radius:var(--radius-m);}
+footer.foot{margin-top:20px;font-size:0.76rem;color:var(--ink-soft);}
+footer.foot code{font-family:var(--font-mono);background:var(--paper-dim);padding:1px 5px;border-radius:4px;}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand-logo"><div><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAGaElEQVR42q2Wa4hdVxXHf2vvfe5jJjPJWG0SCgrJoOmgk8SgpKJMSiH1UfCD3MFvFm0nsSWV1kBBSc4c4gM/iNRqYgPWCn7QXCiFYm0pMb20anzk0TROMYmxUTHTJCYNydw7956z9/LDufO4k5k4E7rgcg77rLv2+q+1/mst4SYSHxpyo1tqXgSd73vlALY6jAfYc7B/rRf3aVX9lAbuBFahWi4ts6XGdf+TPVtPPRIfGnLJ3bVstg33zYP9a10wO4DrIBcwvGWteXP3ljdPJ3fXsgSIFZMIYb7Ldz7bv7anz+72Kp93kSwHIXglePCZBjFiRM35hUA6l9qV5RX2a1MHwSvNRvCjv113UtAD4+cb+xL555U4xiRJ7kTbIb/rhQ/eE3WZaqFk+hrXPc26BhFUQQQEEc2aAREOAYxdrN0QSXn8wJrlheVuzBXNbVkrCIgVsFFRiEqGVj2cTRvhi3s+e+rPcYwBGB1Fd718Z39kw1GxsixthlREHCDTQIJm5R7rJq/7P5mtp+5iFKYAzBbzveGzVxH5aXevLaKAIijamtQwcSVLbSRrTEF+/Y3frFudjKJsGTIiqCF8u9Blpy6Ppi5XCKqaFsvG+VQbasL2RAiMzp8CGytGjq58raV+XdcKNyggIUNAPYJkLW2We9zy0AoTtf7/Hqr9/JzGL625XcU+EVK1IKiqAgFEXEFMeZm1PtN/pZNa+da9p/8wXw1N10ACyvBYCxiOD37oy8bwsHHy0WKXdQA+U+cKAsJngBjQgNvUe5vrbdYDxoJIHvl0MqCqZ5qN8KvJi9kT3x0+c7FyAJtIzpR5HUBioTJmKkByT/VpiJ/Z9dKzG+vXso+BDqB6R/DyXg1yFmJDZUxa6cmJyYnwcqsRmiAToOMCp73aYxfPlY7v33akDrBpZFNUHb7PAwaSPME3E8O7I0YWryvR+gc2zD2MysY4kxmAzBslM5pKpqQmRxAFiZwTNAiAs/kzCy6k9UwRM4NUrKIlSV3j3xzZf6ldrNPfXcAdyxWZ/tacFJo6Nx6FmdcUmulMzJod8AudfwtBiRDT0ocD7GUottSSbFYNTMVLQcPMu5j8t1QJWdtAuydI3pOYuaizCCXIZmzmg+dzYgujhLSJiYqE9Ieofw7jDCELN7/VAh5EekF/AaYbY1GfHbdqHlAfjLfFtwCoJR2McNmJvX8EMIMja9uIFTGoyBvh+FOHloR+6Esl+04pzdELCFfTE/uOzNHSThr27yhyZjxDpdwZSrqoVCzXVjl6xmcm2Nm+G/PSWC2Uzyt1twL1Mt2QVR1ULPQZ2J/NR0PHHe/xnHnSI9s6wywaqFY9Q7Hw4pOzw7ZgU2Hzo1eR+iwGiELVQ7xgD3CLDm+lYqlWvV0/slWlMIqm0Q2tozHhUOmFEBbbVtySq1wpitCNYkHNrAEIIraT5e+mA9WqB/An9j8PPD+vzsd39NrJ1jnErFh011w60WMDKnRAb8tkwSNLwX8rKSAJkOSBHnhoWaFg368hNUimqtf6FFmSzVubP5WKATBR9jNfKP81uMIbwS07qVH5VaAHVb/IghJ3Sw5UqwHAGrvHZxO/I8tyO0a7ReVxhNJiBiGIuv+vtAAXgPTYvhPAiZlOGDv7zvgjMKepzVtHSXCDI590s0yaGQIJ5CuUtuvEz0+u2LDpvOXSakv3WODyhW4MUdtgQFUWBDUQFwLnf+SojSmAFXk9qBfAENKAyv0MfOWX1JLL7cRbhgbaBl8BtuTPWi3NBzS4Ddt3qrgefNrAlMri03zUD2GotXfC9jg20ciD4srrc4NxbEiSYNdv+z5R12O06h5jLap/V5XvhK7icxz+weWFwunWj98VMI+KyBdQ38IWC/jWP3xqPsHY3rfb01lz+ooy+PVuy8TfMOZ9MhOWWPK8bNutxu5CjJse6yH7j8Jhgx4N6DmQFqorRcyACpsFNiAu3yeMQ0P6SpDm/Rx7+txUvme182AHR56itOJB0vrcIsuVo8HtG4OYnRDuw0a908uJzlpaRDrPQorCX1D5cXh97zOz7XVcMRAXnHv7MRUpQZinyttDB4CND33ABL1XYEgJHxZYhdKDqEFlEpFLCmfFyGFRXsyO7/v9XDDcGs3y9XvakSn5yFf7KPge0mAJXXVC3xXGktaCAG42WS8MyM14PuPIEIbbx3Rhox06YWmzEP4HVcT3Ck0vtNoAAAAASUVORK5CYII=" alt="AGQ Labs"></div></div>
+  <div class="brand-text">
+    <span class="brand-name">MOEVE Bridge</span>
+    <span class="brand-tagline">Sincronización Besafer → SGMA</span>
+  </div>
+</header>
+<main>
+  <h1>Panel de sincronización</h1>
+  <p class="subtitle">Histórico de intentos de envío de resultados de Besafer a MOEVE SGMA</p>
+
+  <div class="tiles">
+    <div class="tile good"><div class="value">2</div><div class="label">Enviadas</div></div>
+    <div class="tile warning"><div class="value">0</div><div class="label">Incidencias (sin activo / sin parámetros)</div></div>
+    <div class="tile critical"><div class="value">0</div><div class="label">Errores del WS</div></div>
+    <div class="tile"><div class="value">2</div><div class="label">Total procesadas</div></div>
+  </div>
+
+  <table>
+    <thead><tr><th>Muestra</th><th>Estado</th><th>Mensaje</th><th>Intentos</th><th>Último intento</th></tr></thead>
+    <tbody><tr>
+    <td class="mono">A-26/111620</td>
+    <td><span class="seal" style="color:var(--agq-green-deep);background:var(--agq-green-bg)"><span aria-hidden="true">✓</span> Enviada</span></td>
+    <td>Analitica 63761 creada correctamente. Empresa: LABYGEMA, S.L. Usuario: agqlaboratorio</td>
+    <td class="num">11</td>
+    <td class="mono muted">17/7/2026, 13:01:08</td>
+  </tr>
+<tr>
+    <td class="mono">A-26/111614</td>
+    <td><span class="seal" style="color:var(--agq-green-deep);background:var(--agq-green-bg)"><span aria-hidden="true">✓</span> Enviada</span></td>
+    <td>Analitica 63760 creada correctamente. Empresa: LABYGEMA, S.L. Usuario: agqlaboratorio</td>
+    <td class="num">5</td>
+    <td class="mono muted">17/7/2026, 12:42:35</td>
+  </tr></tbody>
+  </table>
+
+  <footer class="foot">Generado el 2026-07-20T07:38:26.069Z · <code>npm run dashboard</code> para regenerar</footer>
+</main>
+</body>
+</html>
